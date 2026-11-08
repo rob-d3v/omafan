@@ -11,10 +11,11 @@
   "section.manual": "Velocidade manual",
   "fan.reading": "%1 · %2 · %3 → %4",
   "error.body": "O omafan precisa do NBFC-Linux com um config para este notebook e o serviço rodando:",
-  "hint": "F troca a ventoinha · A auto · T turbo · 1–9 = 10–90% · 0 = 100% · ↑↓ ±5%. A velocidade continua depois de fechar o painel.",
+  "hint": "F troca a ventoinha · A auto · O desliga · T turbo · 1–9 = 10–90% · 0 = 100% · ↑↓ ±5%. Acima da temperatura crítica o NBFC liga a ventoinha no máximo de qualquer jeito.",
   "section.target": "Ventoinha",
   "target.all": "Ambas",
   "target.cpu": "CPU",
   "target.gpu": "GPU",
-  "target.fan": "Ventoinha %1"
+  "target.fan": "Ventoinha %1",
+  "preset.off": "Desliga"
 }

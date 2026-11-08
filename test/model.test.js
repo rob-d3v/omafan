@@ -50,6 +50,9 @@ test("mode reads auto, manual, and mixed", () => {
   const manual = auto.map(f => ({ ...f, auto: false, target: 75 }))
   assert.deepStrictEqual(Model.mode(manual), { kind: "manual", speed: 75 })
   assert.strictEqual(Model.presetForMode(Model.mode(manual)), "75")
+  const stopped = auto.map(f => ({ ...f, auto: false, target: 0 }))
+  assert.strictEqual(Model.presetForMode(Model.mode(stopped)), "0")
+  assert.deepStrictEqual(Model.setCommand("0", 0), ["nbfc", "set", "-s", "0", "-f", "0"])
   manual[1].target = 40
   assert.strictEqual(Model.mode(manual).kind, "mixed")
   assert.strictEqual(Model.mode([]).kind, "none")

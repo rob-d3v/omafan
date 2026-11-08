@@ -91,11 +91,12 @@ Panel {
   function presetLabel(value) {
     if (value === "auto") return strings.t("preset.auto")
     if (value === "100") return strings.t("preset.turbo")
+    if (value === "0") return strings.t("preset.off")
     return root.percentText(Number(value))
   }
 
   function presetIcon(value) {
-    return value === "auto" ? "󰁪" : value === "100" ? "󱐋" : "󰈐"
+    return value === "auto" ? "󰁪" : value === "100" ? "󱐋" : value === "0" ? "󰤆" : "󰈐"
   }
 
   function toggleTemperature() {
@@ -211,6 +212,7 @@ Panel {
         if (text === "a") root.apply("auto")
         else if (text === "t") root.apply(100)
         else if (text === "f") root.cycleTarget()
+        else if (text === "o") root.apply(0)
         else if (isFinite(Model.speedForDigit(text))) root.apply(Model.speedForDigit(text))
       }
 

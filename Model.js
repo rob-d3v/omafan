@@ -79,8 +79,10 @@ function heat(temperature) {
   return "calm"
 }
 
-// The preset chips: value "auto" or a fixed percentage.
-var presets = ["auto", "50", "75", "100"]
+// The preset chips: value "auto" or a fixed percentage; "0" stops the fan.
+// Stopping is safe to offer because nbfc's critical mode still runs the fan
+// at full speed once the config's critical temperature is reached.
+var presets = ["auto", "0", "50", "75", "100"]
 
 function presetForMode(m) {
   if (m.kind === "auto") return "auto"
