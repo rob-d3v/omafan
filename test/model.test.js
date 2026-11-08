@@ -118,5 +118,6 @@ test("silent mode commands only take known actions", () => {
 
 test("resolves the script path from a file URL", () => {
   assert.strictEqual(Model.localPath("file:///home/a/My%20Plugins/silence.sh"), "/home/a/My Plugins/silence.sh")
+  assert.strictEqual(Model.localPath("qs:///home/a/plugins/x/silence.sh"), "/home/a/plugins/x/silence.sh")
   assert.strictEqual(Model.localPath("qrc:/silence.sh"), "")
 })

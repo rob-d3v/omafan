@@ -136,11 +136,11 @@ function parseSilence(raw) {
   return { silent: /\bsilent=on\b/.test(text), tuned: /\btuned=yes\b/.test(text) }
 }
 
-// A file:// URL from Qt.resolvedUrl to a plain path for the argument list.
+// A URL from Qt.resolvedUrl to a plain path for the argument list. Quickshell
+// loads plugins as qs:///abs/path, plain QML as file:///abs/path.
 function localPath(url) {
-  var text = String(url || "")
-  if (text.indexOf("file://") !== 0) return ""
-  return decodeURIComponent(text.slice("file://".length))
+  var match = /^(?:file|qs):\/\/(\/.*)$/.exec(String(url || ""))
+  return match ? decodeURIComponent(match[1]) : ""
 }
 
 // The command that turns silent mode on ("install") or off ("remove").
