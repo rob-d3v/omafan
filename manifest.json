@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.rob-d3v.omafan",
+  "name": "omafan",
+  "version": "0.1.0",
+  "author": "rob-d3v",
+  "license": "MIT",
+  "description": "Fan control for laptops through NBFC-Linux: temperatures, auto, presets, turbo and a manual speed slider. A NitroSense-style panel for Acer Nitro and others. Unofficial community plugin.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "Widget.qml"
+  },
+  "barWidget": {
+    "displayName": "omafan",
+    "description": "Fan icon that turns red when hot. Click opens the fan panel; right click shows the temperature in the bar.",
+    "category": "System",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "showTemperature": false
+    }
+  }
+}

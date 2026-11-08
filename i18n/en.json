@@ -1,0 +1,20 @@
+{
+  "title": "Fans",
+  "status.auto": "Automatic",
+  "status.manual": "Fixed at %1",
+  "status.mixed": "Mixed",
+  "status.critical": "Critical, full speed",
+  "status.offline": "NBFC not running",
+  "preset.auto": "Auto",
+  "preset.turbo": "Turbo",
+  "section.mode": "Mode",
+  "section.manual": "Manual speed",
+  "fan.reading": "%1 · %2 · %3 → %4",
+  "error.body": "omafan needs NBFC-Linux with a config for this laptop and its service running:",
+  "hint": "F switches fan · A auto · T turbo · 1–9 = 10–90% · 0 = 100% · ↑↓ ±5%. The speed stays after the panel closes.",
+  "section.target": "Fan",
+  "target.all": "Both",
+  "target.cpu": "CPU",
+  "target.gpu": "GPU",
+  "target.fan": "Fan %1"
+}
