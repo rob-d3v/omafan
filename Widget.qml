@@ -8,10 +8,12 @@ import "Model.js" as Model
 
 // Fan control for laptops driven by NBFC-Linux. A bar icon that turns urgent
 // when the machine runs hot, and a panel with every fan's temperature and
-// speed, presets (auto, 50 %, 75 %, turbo), and a manual speed slider.
+// speed, presets (auto, off, 50 %, 75 %, turbo), a manual speed slider, and
+// silent mode (silence.sh: a user service that holds the fans quiet).
 //
 // Everything goes through the unprivileged `nbfc` client, which talks to the
-// nbfc_service socket; the plugin never asks for root. Toggle the panel from
+// nbfc_service socket; the plugin never asks for root. Silent mode only
+// installs a user systemd unit; its optional root tuning is left to the user. Toggle the panel from
 // anywhere with: omarchy-shell io.github.rob-d3v.omafan toggle
 Panel {
   id: root
@@ -27,6 +29,16 @@ Panel {
   property int fanTarget: -1
   // The speed being dragged or typed, shown until nbfc reports it back.
   property real pendingSpeed: NaN
+  // Silent mode (silence.sh). `silentWanted` is the optimistic value shown
+  // while the service starts or stops.
+  property bool silent: false
+  property bool tuned: false
+  property var silentWanted: undefined
+  // A mode picked while silent mode runs: applied once the service is off,
+  // otherwise its loop would put the fans straight back to 1 %.
+  property var applyAfterSilence: undefined
+  readonly property string silenceScript: Model.localPath(Qt.resolvedUrl("silence.sh"))
+  readonly property bool silentShown: silentWanted !== undefined ? silentWanted : silent
 
   readonly property bool showTemperature: setting("showTemperature", false) === true
   readonly property var fans: status.fans || []
@@ -62,6 +74,7 @@ Panel {
 
   function modeText() {
     if (!root.working) return strings.t("status.offline")
+    if (root.silentShown) return strings.t("status.silent")
     return root.modeLabel(Model.mode(root.fans))
   }
 
@@ -78,11 +91,27 @@ Panel {
 
   function refresh() {
     if (!statusProc.running) statusProc.running = true
+    if (!silenceStatusProc.running && !silenceProc.running && root.silenceScript !== "") silenceStatusProc.running = true
+  }
+
+  function setSilent(on) {
+    var command = Model.silenceCommand(on ? "install" : "remove", root.silenceScript)
+    if (!command || silenceProc.running) return
+    root.silentWanted = on
+    silenceProc.command = command
+    silenceProc.running = true
   }
 
   function apply(value) {
     var command = Model.setCommand(value, root.fanTarget)
     if (!command || actionProc.running) return
+    if (root.silentShown) {
+      // Picking a mode means "I want this now": silent mode steps aside.
+      root.applyAfterSilence = value
+      root.pendingSpeed = value === "auto" ? NaN : Number(command[3])
+      root.setSilent(false)
+      return
+    }
     root.pendingSpeed = value === "auto" ? NaN : Number(command[3])
     actionProc.command = command
     actionProc.running = true
@@ -138,6 +167,46 @@ Panel {
       // Drop the pending speed once nbfc reports the fans where it was sent.
       if (isFinite(root.pendingSpeed) && root.mode.kind === "manual" && root.mode.speed === Math.round(root.pendingSpeed))
         root.pendingSpeed = NaN
+    }
+  }
+
+  Process {
+    id: silenceStatusProc
+    command: Model.silenceCommand("status", root.silenceScript) || ["true"]
+    stdout: StdioCollector {
+      id: silenceStatusOut
+      waitForEnd: true
+    }
+    onExited: {
+      var parsed = Model.parseSilence(silenceStatusOut.text)
+      root.silent = parsed.silent
+      root.tuned = parsed.tuned
+      if (root.silentWanted === parsed.silent) root.silentWanted = undefined
+    }
+  }
+
+  Process {
+    id: silenceProc
+    stderr: StdioCollector {
+      id: silenceErr
+      waitForEnd: true
+    }
+    onExited: function(exitCode) {
+      if (exitCode !== 0) {
+        root.silentWanted = undefined
+        root.applyAfterSilence = undefined
+        root.error = String(silenceErr.text || "").trim().slice(0, 240)
+      } else {
+        root.silent = root.silentWanted === true
+        root.silentWanted = undefined
+        if (root.applyAfterSilence !== undefined) {
+          var value = root.applyAfterSilence
+          root.applyAfterSilence = undefined
+          root.apply(value)
+          return
+        }
+      }
+      root.refresh()
     }
   }
 
@@ -212,6 +281,7 @@ Panel {
         if (text === "a") root.apply("auto")
         else if (text === "t") root.apply(100)
         else if (text === "f") root.cycleTarget()
+        else if (text === "s") root.setSilent(!root.silentShown)
         else if (text === "o") root.apply(0)
         else if (isFinite(Model.speedForDigit(text))) root.apply(Model.speedForDigit(text))
       }
@@ -422,7 +492,7 @@ Panel {
                 horizontalPadding: Style.spacing.controlPaddingX
                 verticalPadding: Style.spacing.controlPaddingY + Style.space(2)
                 bordered: true
-                active: Model.presetForMode(root.mode) === modelData
+                active: !root.silentShown && Model.presetForMode(root.mode) === modelData
                 hasCursor: root.cursorIndex === index
                 onClicked: root.apply(modelData)
                 onHovered: function(h) { if (h) root.cursorIndex = index }
@@ -461,6 +531,48 @@ Panel {
             tickCount: 5
             value: root.sliderSpeed
             onReleased: function(value) { root.apply(value) }
+          }
+
+          // ---------- Silent mode ----------
+          PanelSectionHeader {
+            visible: root.silenceScript !== ""
+            text: strings.t("section.silent")
+            foreground: root.bar.foreground
+            fontFamily: root.bar.fontFamily
+          }
+
+          Toggle {
+            visible: root.silenceScript !== ""
+            width: parent.width
+            label: strings.t("silent.label")
+            description: silenceProc.running ? strings.t("silent.busy")
+              : root.silentShown ? strings.t("silent.on") : strings.t("silent.off")
+            checked: root.silentShown
+            foreground: root.bar.foreground
+            fontFamily: root.bar.fontFamily
+            activeFocusOnTab: false
+            onClicked: root.setSilent(!root.silentShown)
+          }
+
+          Column {
+            visible: root.silenceScript !== "" && root.silentShown
+            width: parent.width
+            spacing: Style.space(4)
+
+            PlainText {
+              width: parent.width
+              wrapMode: Text.Wrap
+              text: root.tuned ? strings.t("silent.tuned") : strings.t("silent.tune")
+              opacity: 0.6
+              font.pixelSize: Style.font.caption
+            }
+            PlainText {
+              width: parent.width
+              wrapMode: Text.WrapAnywhere
+              text: "sudo " + root.silenceScript + (root.tuned ? " untune" : " tune")
+              font.family: "monospace"
+              font.pixelSize: Style.font.caption
+            }
           }
 
           PlainText {

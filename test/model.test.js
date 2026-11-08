@@ -101,3 +101,22 @@ test("digit shortcuts", () => {
   assert.strictEqual(Model.speedForDigit("0"), 100)
   assert.ok(Number.isNaN(Model.speedForDigit("a")))
 })
+
+test("parses silent mode status", () => {
+  assert.deepStrictEqual(Model.parseSilence("silent=on tuned=no\n"), { silent: true, tuned: false })
+  assert.deepStrictEqual(Model.parseSilence("silent=off tuned=yes"), { silent: false, tuned: true })
+  assert.deepStrictEqual(Model.parseSilence(""), { silent: false, tuned: false })
+  assert.deepStrictEqual(Model.parseSilence("silent=online"), { silent: false, tuned: false })
+})
+
+test("silent mode commands only take known actions", () => {
+  assert.deepStrictEqual(Model.silenceCommand("install", "/p/silence.sh"), ["bash", "/p/silence.sh", "install"])
+  assert.deepStrictEqual(Model.silenceCommand("remove", "/p/silence.sh"), ["bash", "/p/silence.sh", "remove"])
+  assert.strictEqual(Model.silenceCommand("tune", "/p/silence.sh"), null)
+  assert.strictEqual(Model.silenceCommand("install", ""), null)
+})
+
+test("resolves the script path from a file URL", () => {
+  assert.strictEqual(Model.localPath("file:///home/a/My%20Plugins/silence.sh"), "/home/a/My Plugins/silence.sh")
+  assert.strictEqual(Model.localPath("qrc:/silence.sh"), "")
+})

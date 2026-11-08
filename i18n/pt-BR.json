@@ -11,11 +11,19 @@
   "section.manual": "Velocidade manual",
   "fan.reading": "%1 · %2 · %3 → %4",
   "error.body": "O omafan precisa do NBFC-Linux com um config para este notebook e o serviço rodando:",
-  "hint": "F troca a ventoinha · A auto · O desliga · T turbo · 1–9 = 10–90% · 0 = 100% · ↑↓ ±5%. Acima da temperatura crítica o NBFC liga a ventoinha no máximo de qualquer jeito.",
+  "hint": "F troca a ventoinha · S modo silencioso · A auto · O desliga · T turbo · 1–9 = 10–90% · 0 = 100% · ↑↓ ±5%. Acima da temperatura crítica o NBFC liga a ventoinha no máximo de qualquer jeito.",
   "section.target": "Ventoinha",
   "target.all": "Ambas",
   "target.cpu": "CPU",
   "target.gpu": "GPU",
   "target.fan": "Ventoinha %1",
-  "preset.off": "Desliga"
+  "preset.off": "Desliga",
+  "status.silent": "Modo silencioso",
+  "section.silent": "Modo silencioso",
+  "silent.label": "Manter as ventoinhas quietas",
+  "silent.off": "Segura as ventoinhas em 1 % num loop, mesmo depois de reiniciar. Volta ao auto a 95 °C.",
+  "silent.on": "Ligado, também depois de reiniciar. Escolher um modo acima desliga.",
+  "silent.busy": "Trocando…",
+  "silent.tune": "Mais silêncio ainda (boost da CPU desligado, crítico a 98 °C), num terminal:",
+  "silent.tuned": "Ajustado. Para desfazer, num terminal:"
 }

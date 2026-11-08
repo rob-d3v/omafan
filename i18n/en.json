@@ -11,11 +11,19 @@
   "section.manual": "Manual speed",
   "fan.reading": "%1 · %2 · %3 → %4",
   "error.body": "omafan needs NBFC-Linux with a config for this laptop and its service running:",
-  "hint": "F switches fan · A auto · O off · T turbo · 1–9 = 10–90% · 0 = 100% · ↑↓ ±5%. Past the critical temperature NBFC runs the fan at full speed anyway.",
+  "hint": "F switches fan · S silent mode · A auto · O off · T turbo · 1–9 = 10–90% · 0 = 100% · ↑↓ ±5%. Past the critical temperature NBFC runs the fan at full speed anyway.",
   "section.target": "Fan",
   "target.all": "Both",
   "target.cpu": "CPU",
   "target.gpu": "GPU",
   "target.fan": "Fan %1",
-  "preset.off": "Off"
+  "preset.off": "Off",
+  "status.silent": "Silent mode",
+  "section.silent": "Silent mode",
+  "silent.label": "Keep the fans quiet",
+  "silent.off": "Holds the fans at 1 % in a loop, even after a reboot. Back to auto at 95 °C.",
+  "silent.on": "On, also after a reboot. Picking a mode above turns it off.",
+  "silent.busy": "Switching…",
+  "silent.tune": "Quieter still (CPU boost off, critical at 98 °C), in a terminal:",
+  "silent.tuned": "Tuned. Undo in a terminal:"
 }

@@ -129,6 +129,26 @@ function speedForDigit(text) {
   return digit === 0 ? 100 : digit * 10
 }
 
+// Silent mode lives in silence.sh next to this file, as a user systemd
+// service. `silence.sh status` prints "silent=on|off tuned=yes|no".
+function parseSilence(raw) {
+  var text = String(raw || "")
+  return { silent: /\bsilent=on\b/.test(text), tuned: /\btuned=yes\b/.test(text) }
+}
+
+// A file:// URL from Qt.resolvedUrl to a plain path for the argument list.
+function localPath(url) {
+  var text = String(url || "")
+  if (text.indexOf("file://") !== 0) return ""
+  return decodeURIComponent(text.slice("file://".length))
+}
+
+// The command that turns silent mode on ("install") or off ("remove").
+function silenceCommand(action, scriptPath) {
+  if (["install", "remove", "status"].indexOf(action) === -1 || !scriptPath) return null
+  return ["bash", scriptPath, action]
+}
+
 if (typeof module !== "undefined") {
-  module.exports = { parseStatus, mode, targetFans, fanKind, hottest, heat, presets, presetForMode, setCommand, speedForDigit }
+  module.exports = { parseStatus, mode, targetFans, fanKind, hottest, heat, presets, presetForMode, setCommand, speedForDigit, parseSilence, localPath, silenceCommand }
 }

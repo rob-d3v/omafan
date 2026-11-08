@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "id": "io.github.rob-d3v.omafan",
   "name": "omafan",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "rob-d3v",
   "license": "MIT",
-  "description": "Fan control for laptops through NBFC-Linux: temperatures, auto, presets, turbo and a manual speed slider. A NitroSense-style panel for Acer Nitro and others. Unofficial community plugin.",
+  "description": "Fan control for laptops through NBFC-Linux: temperatures, auto, presets, turbo, a manual speed slider and a silent mode for the night. A NitroSense-style panel for Acer Nitro and others. Unofficial community plugin.",
   "kinds": [
     "bar-widget"
   ],
